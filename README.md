@@ -4,4 +4,4 @@ An android app for detecting objects in a picture or live via the camera. The mo
 
 # Showcase
 
-![App Screen](app_screen.jpg)
+![App Screen](app_screen.jpg | width=200)
