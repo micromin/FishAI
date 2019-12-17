@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.innoxlab.fishai.tflite;
+package com.innoxlab.objectai.tflite;
 
 import android.content.Context;
 import android.util.AttributeSet;

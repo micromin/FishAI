@@ -1,4 +1,4 @@
-package com.innoxlab.fishai;
+package com.innoxlab.objectai;
 
 import android.Manifest;
 import android.app.Fragment;
@@ -38,11 +38,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.innoxlab.fishai.tflite.BorderedText;
-import com.innoxlab.fishai.tflite.CameraConnectionFragment;
-import com.innoxlab.fishai.tflite.Classifier;
-import com.innoxlab.fishai.tflite.ImageUtils;
-import com.innoxlab.fishai.tflite.LegacyCameraConnectionFragment;
+import com.innoxlab.objectai.tflite.BorderedText;
+import com.innoxlab.objectai.tflite.CameraConnectionFragment;
+import com.innoxlab.objectai.tflite.Classifier;
+import com.innoxlab.objectai.tflite.ImageUtils;
+import com.innoxlab.objectai.tflite.LegacyCameraConnectionFragment;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

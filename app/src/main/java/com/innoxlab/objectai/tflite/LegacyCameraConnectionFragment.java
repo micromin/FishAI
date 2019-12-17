@@ -1,4 +1,4 @@
-package com.innoxlab.fishai.tflite;
+package com.innoxlab.objectai.tflite;
 
 /*
  * Copyright 2019 The TensorFlow Authors. All Rights Reserved.
@@ -34,7 +34,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import com.innoxlab.fishai.R;
+import com.innoxlab.objectai.R;
 
 import java.io.IOException;
 import java.util.List;

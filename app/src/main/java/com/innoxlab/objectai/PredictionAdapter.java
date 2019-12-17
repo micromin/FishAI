@@ -1,4 +1,4 @@
-package com.innoxlab.fishai;
+package com.innoxlab.objectai;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.innoxlab.fishai.tflite.Classifier;
+import com.innoxlab.objectai.tflite.Classifier;
 
 import java.util.ArrayList;
 import java.util.Locale;

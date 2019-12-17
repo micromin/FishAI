@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.innoxlab.fishai.tflite;
+package com.innoxlab.objectai.tflite;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -54,7 +54,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.innoxlab.fishai.R;
+import com.innoxlab.objectai.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;

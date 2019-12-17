@@ -1,4 +1,4 @@
-package com.innoxlab.fishai;
+package com.innoxlab.objectai;
 
 import org.junit.Test;
 
