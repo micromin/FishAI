@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ImageReader.OnImageAvailableListener,
-        Camera.PreviewCallback{
+        Camera.PreviewCallback {
     private String TAG = MainActivity.class.getSimpleName();
 
     private Fragment fragment;
@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
     private static PredictionAdapter adapter;
     private TextView noPrediction;
     private FrameLayout frameLayout;
+    private boolean computingDetection = false;
 
     private ArrayList<Classifier.Recognition> predictions;
 
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
     private static final float TEXT_SIZE_DIP = 10;
     private Bitmap rgbFrameBitmap = null;
-    private long lastProcessingTimeMs;
     private Integer sensorOrientation;
     private BorderedText borderedText;
     private ImageView imageView;
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTitle("FishAI");
+        setTitle("ObjectAI");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
         buttonLoadImage.setOnClickListener(l -> {
             predictions.clear();
             adapter.notifyDataSetChanged();
-            if (fragment != null){
+            if (fragment != null) {
                 getFragmentManager().beginTransaction().remove(fragment).commit();
             }
             imageView.setVisibility(View.VISIBLE);
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
         buttonCaptureImage.setOnClickListener(l -> {
             predictions.clear();
             adapter.notifyDataSetChanged();
-            if (fragment != null){
+            if (fragment != null) {
                 getFragmentManager().beginTransaction().remove(fragment).commit();
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -273,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
 
         getFragmentManager().beginTransaction().replace(R.id.camera_container, fragment).commit();
     }
+
     protected Size getDesiredPreviewFrameSize() {
         return DESIRED_PREVIEW_SIZE;
     }
@@ -352,6 +353,12 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
         handler.post(r);
     }
 
+    protected void readyForNextImage() {
+        if (postInferenceCallback != null) {
+            postInferenceCallback.run();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -406,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
     }
 
     private void processImage(final Bitmap bitmap, int sensorOrientation) {
-        Log.d(TAG, "Heree!!!");
         final List<Classifier.Recognition> results =
                 classifier.recognizeImage(bitmap, sensorOrientation);
         Log.v(TAG, String.format("Detect: %s", results));
@@ -416,8 +422,9 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
 
     @UiThread
     private void showResultsInUI(List<Classifier.Recognition> results) {
+        Log.d(TAG, "showResultsInUI");
         predictions.clear();
-
+        computingDetection = false;
         int counter = 0;
         while (results != null && counter < results.size() && counter < 3) {
             Classifier.Recognition recognition = results.get(counter);
@@ -443,6 +450,7 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
 
     @Override
     public void onPreviewFrame(final byte[] bytes, final Camera camera) {
+        Log.d(TAG, "onPreviewFrame");
         if (isProcessingFrame) {
             Log.w(TAG, "Dropping frame!");
             return;
@@ -484,7 +492,14 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
                 };
 
 
+        if (computingDetection) {
+            readyForNextImage();
+            return;
+        }
+        computingDetection = true;
+
         rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
+        readyForNextImage();
         processImage(rgbFrameBitmap, sensorOrientation);
     }
 
@@ -503,6 +518,7 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
 
     @Override
     public void onImageAvailable(final ImageReader reader) {
+        Log.d(TAG, "onImageAvailable");
         if (previewWidth == 0 || previewHeight == 0) {
             return;
         }
@@ -553,7 +569,17 @@ public class MainActivity extends AppCompatActivity implements ImageReader.OnIma
                             isProcessingFrame = false;
                         }
                     };
+
+            if (computingDetection) {
+                readyForNextImage();
+                return;
+            }
+            computingDetection = true;
+
             rgbFrameBitmap.setPixels(getRgbBytes(), 0, previewWidth, 0, 0, previewWidth, previewHeight);
+
+            readyForNextImage();
+
             processImage(rgbFrameBitmap, sensorOrientation);
         } catch (final Exception e) {
             Log.e(TAG, "Exception!", e);
